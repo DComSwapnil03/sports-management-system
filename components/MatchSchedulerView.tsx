@@ -8,10 +8,7 @@ import {
   CheckCircle,
   Clock,
   Trash2,
-  Filter,
-  Activity,
   RotateCcw,
-  Sparkles,
 } from 'lucide-react';
 import { Match, Team, MatchStatus } from '../types/sports';
 
@@ -51,7 +48,7 @@ export const MatchSchedulerView: React.FC<MatchSchedulerViewProps> = ({
     return statusMatch && teamMatch;
   });
 
-  // Sort matches: live first, then upcoming (soonest first), then completed (newest first)
+  // Sort matches: live first, then upcoming, then completed
   const sortedMatches = [...filteredMatches].sort((a, b) => {
     if (a.status === 'live' && b.status !== 'live') return -1;
     if (b.status === 'live' && a.status !== 'live') return 1;
@@ -74,52 +71,52 @@ export const MatchSchedulerView: React.FC<MatchSchedulerViewProps> = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 sm:space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2">
-            <CalendarDays className="w-6 h-6 text-emerald-400" />
-            Match Scheduler & Live Scoreboard
+          <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+            <CalendarDays className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-500" />
+            Match Center & Live Scores
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1">
             Real-time score updates, live match controllers, and instant automated standings sync.
           </p>
         </div>
 
         <button
           onClick={onOpenNewMatch}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow-lg shadow-emerald-500/20 transition-all cursor-pointer self-start sm:self-auto"
+          className="flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow-md shadow-emerald-500/20 transition-all cursor-pointer self-stretch sm:self-auto"
         >
           <Plus className="w-4 h-4 stroke-[2.5]" />
-          Schedule New Match
+          <span>Schedule New Match</span>
         </button>
       </div>
 
       {/* Filter Tabs */}
-      <div className="p-4 rounded-2xl bg-[#1e293b]/70 border border-[#334155] flex flex-col md:flex-row items-center justify-between gap-3">
+      <div className="p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-[#1e293b]/70 border border-slate-200 dark:border-[#334155] shadow-xs flex flex-col md:flex-row items-center justify-between gap-3">
         {/* Status Filters */}
-        <div className="flex items-center gap-1.5 w-full md:w-auto overflow-x-auto">
+        <div className="flex items-center gap-1.5 w-full md:w-auto overflow-x-auto pb-1 md:pb-0 scrollbar-none">
           {[
             { id: 'all', label: 'All Fixtures' },
             {
               id: 'live',
-              label: `Live Scoreboard ${liveCount > 0 ? `(${liveCount})` : ''}`,
+              label: `Live ${liveCount > 0 ? `(${liveCount})` : ''}`,
               badge: liveCount > 0,
             },
             { id: 'scheduled', label: 'Upcoming' },
-            { id: 'completed', label: 'Completed (Final)' },
+            { id: 'completed', label: 'Completed' },
           ].map((tab) => (
             <button
               key={tab.id}
               onClick={() => setFilterStatus(tab.id)}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 ${
                 filterStatus === tab.id
-                  ? 'bg-emerald-500 text-slate-950 shadow-sm'
-                  : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white'
+                  ? 'bg-emerald-500 text-slate-950 shadow-xs'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
               }`}
             >
-              {tab.badge && <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />}
+              {tab.badge && <span className="w-2 h-2 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-ping" />}
               {tab.label}
             </button>
           ))}
@@ -127,11 +124,11 @@ export const MatchSchedulerView: React.FC<MatchSchedulerViewProps> = ({
 
         {/* Filter by Team */}
         <div className="flex items-center gap-2 w-full md:w-auto justify-end">
-          <span className="text-xs text-slate-400 hidden sm:inline">Club Filter:</span>
+          <span className="text-xs text-slate-500 dark:text-slate-400 hidden sm:inline">Club Filter:</span>
           <select
             value={selectedTeamFilter}
             onChange={(e) => setSelectedTeamFilter(e.target.value)}
-            className="bg-slate-900 border border-slate-700 text-white text-xs rounded-xl px-3 py-1.5 focus:outline-none focus:border-emerald-500"
+            className="w-full sm:w-auto bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs rounded-xl px-3 py-1.5 focus:outline-none focus:border-emerald-500"
           >
             <option value="all">All Teams</option>
             {teams.map((t) => (
@@ -145,10 +142,10 @@ export const MatchSchedulerView: React.FC<MatchSchedulerViewProps> = ({
 
       {/* Matches Grid */}
       {sortedMatches.length === 0 ? (
-        <div className="p-12 rounded-2xl bg-[#1e293b]/50 border border-dashed border-slate-700 text-center space-y-3">
-          <CalendarDays className="w-10 h-10 text-slate-500 mx-auto" />
-          <h3 className="text-base font-bold text-white">No fixtures found</h3>
-          <p className="text-xs text-slate-400 max-w-sm mx-auto">
+        <div className="p-10 sm:p-12 rounded-2xl bg-white dark:bg-[#1e293b]/50 border border-dashed border-slate-300 dark:border-slate-700 text-center space-y-3">
+          <CalendarDays className="w-10 h-10 text-slate-400 dark:text-slate-500 mx-auto" />
+          <h3 className="text-base font-bold text-slate-900 dark:text-white">No fixtures found</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
             There are no matches matching the active filter. Click &quot;Schedule New Match&quot; to arrange a clash.
           </p>
         </div>
@@ -165,47 +162,47 @@ export const MatchSchedulerView: React.FC<MatchSchedulerViewProps> = ({
             return (
               <div
                 key={match.id}
-                className={`rounded-2xl p-5 border transition-all duration-200 flex flex-col justify-between ${
+                className={`rounded-2xl p-4 sm:p-5 border transition-all duration-200 flex flex-col justify-between shadow-xs ${
                   isLive
-                    ? 'bg-slate-900/95 border-emerald-500/70 shadow-xl shadow-emerald-500/10 ring-1 ring-emerald-500/30'
+                    ? 'bg-slate-50 dark:bg-slate-900/95 border-emerald-500 dark:border-emerald-500/70 ring-1 ring-emerald-500/30'
                     : isCompleted
-                    ? 'bg-[#1e293b]/90 border-[#334155]'
-                    : 'bg-[#1e293b]/60 border-[#334155]/70'
+                    ? 'bg-white dark:bg-[#1e293b]/90 border-slate-200 dark:border-[#334155]'
+                    : 'bg-white/80 dark:bg-[#1e293b]/60 border-slate-200 dark:border-[#334155]/70'
                 }`}
               >
                 <div>
                   {/* Top Bar: Match status and venue */}
-                  <div className="flex items-center justify-between text-xs pb-3 border-b border-slate-700/60 mb-4">
+                  <div className="flex items-center justify-between text-xs pb-3 border-b border-slate-100 dark:border-slate-700/60 mb-3 sm:mb-4">
                     <div className="flex items-center gap-2">
                       {isLive && (
-                        <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-[11px] animate-pulse">
-                          <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                        <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-bold text-[10px] sm:text-[11px] animate-pulse border border-emerald-500/30">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                           LIVE {match.minute ? `• ${match.minute}'` : ''}
                         </span>
                       )}
                       {isCompleted && (
-                        <span className="px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 font-bold text-[11px] border border-slate-700">
-                          FINAL SCORE
+                        <span className="px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-[10px] sm:text-[11px] border border-slate-200 dark:border-slate-700">
+                          FINAL
                         </span>
                       )}
                       {isScheduled && (
-                        <span className="px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 font-semibold text-[11px] border border-amber-500/30 flex items-center gap-1">
+                        <span className="px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-300 font-semibold text-[10px] sm:text-[11px] border border-amber-500/30 flex items-center gap-1">
                           <Clock className="w-3 h-3" />
                           SCHEDULED
                         </span>
                       )}
-                      <span className="text-slate-400 font-medium">Round {match.round}</span>
+                      <span className="text-slate-500 dark:text-slate-400 font-medium text-[11px]">Round {match.round}</span>
                     </div>
 
-                    <div className="flex items-center gap-3 text-slate-400">
-                      <span>{match.date} • {match.time}</span>
+                    <div className="flex items-center gap-2 sm:gap-3 text-slate-500 dark:text-slate-400 text-[11px]">
+                      <span>{match.date}</span>
                       <button
                         onClick={() => {
                           if (confirm('Delete this match fixture?')) {
                             onDeleteMatch(match.id);
                           }
                         }}
-                        className="text-slate-400 hover:text-red-400 transition-colors p-1"
+                        className="text-slate-400 hover:text-red-500 transition-colors p-1"
                         title="Delete fixture"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -214,19 +211,19 @@ export const MatchSchedulerView: React.FC<MatchSchedulerViewProps> = ({
                   </div>
 
                   {/* Main Scoreboard Area */}
-                  <div className="grid grid-cols-5 items-center gap-2 py-2">
+                  <div className="grid grid-cols-5 items-center gap-1.5 sm:gap-2 py-2">
                     {/* Home Team */}
                     <div className="col-span-2 text-right space-y-1">
-                      <div className="flex items-center justify-end gap-2">
-                        <span className="text-sm sm:text-base font-extrabold text-white truncate">
+                      <div className="flex items-center justify-end gap-1.5 sm:gap-2">
+                        <span className="text-xs sm:text-base font-extrabold text-slate-900 dark:text-white truncate">
                           {home?.name || 'Home Club'}
                         </span>
                         <span
-                          className="w-3.5 h-3.5 rounded-full shrink-0 shadow-sm"
+                          className="w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full shrink-0 shadow-xs"
                           style={{ backgroundColor: home?.primaryColor || '#10b981' }}
                         />
                       </div>
-                      <span className="text-[11px] text-slate-400 block font-mono">
+                      <span className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 block font-mono truncate">
                         {home?.coach ? `Coach: ${home.coach}` : ''}
                       </span>
                     </div>
@@ -234,13 +231,13 @@ export const MatchSchedulerView: React.FC<MatchSchedulerViewProps> = ({
                     {/* Central Score Display */}
                     <div className="col-span-1 flex flex-col items-center justify-center">
                       {isEditing ? (
-                        <div className="flex items-center gap-1 bg-slate-800 p-1.5 rounded-xl border border-slate-700">
+                        <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-300 dark:border-slate-700">
                           <input
                             type="number"
                             min="0"
                             value={tempHomeScore}
                             onChange={(e) => setTempHomeScore(Math.max(0, Number(e.target.value)))}
-                            className="w-9 text-center bg-slate-900 text-white font-mono font-bold text-sm rounded border border-slate-700"
+                            className="w-8 sm:w-9 text-center bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-mono font-bold text-sm rounded border border-slate-200 dark:border-slate-700"
                           />
                           <span className="text-slate-400 font-bold">-</span>
                           <input
@@ -248,30 +245,30 @@ export const MatchSchedulerView: React.FC<MatchSchedulerViewProps> = ({
                             min="0"
                             value={tempAwayScore}
                             onChange={(e) => setTempAwayScore(Math.max(0, Number(e.target.value)))}
-                            className="w-9 text-center bg-slate-900 text-white font-mono font-bold text-sm rounded border border-slate-700"
+                            className="w-8 sm:w-9 text-center bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-mono font-bold text-sm rounded border border-slate-200 dark:border-slate-700"
                           />
                         </div>
                       ) : (
-                        <div className="flex items-center gap-2 font-mono">
+                        <div className="flex items-center gap-1 sm:gap-2 font-mono">
                           <span
-                            className={`text-2xl sm:text-3xl font-black px-2.5 py-1 rounded-xl ${
+                            className={`text-xl sm:text-3xl font-black px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-xl ${
                               isLive
-                                ? 'bg-slate-800 text-emerald-400 border border-emerald-500/40 shadow-sm'
+                                ? 'bg-emerald-50 dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 border border-emerald-500/40'
                                 : isCompleted && match.homeScore > match.awayScore
-                                ? 'bg-emerald-500/10 text-emerald-400 font-black'
-                                : 'bg-slate-800/80 text-white'
+                                ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-black'
+                                : 'bg-slate-100 dark:bg-slate-800/80 text-slate-900 dark:text-white'
                             }`}
                           >
                             {match.homeScore}
                           </span>
-                          <span className="text-slate-500 font-extrabold">:</span>
+                          <span className="text-slate-400 font-extrabold">:</span>
                           <span
-                            className={`text-2xl sm:text-3xl font-black px-2.5 py-1 rounded-xl ${
+                            className={`text-xl sm:text-3xl font-black px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-xl ${
                               isLive
-                                ? 'bg-slate-800 text-emerald-400 border border-emerald-500/40 shadow-sm'
+                                ? 'bg-emerald-50 dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 border border-emerald-500/40'
                                 : isCompleted && match.awayScore > match.homeScore
-                                ? 'bg-emerald-500/10 text-emerald-400 font-black'
-                                : 'bg-slate-800/80 text-white'
+                                ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-black'
+                                : 'bg-slate-100 dark:bg-slate-800/80 text-slate-900 dark:text-white'
                             }`}
                           >
                             {match.awayScore}
@@ -279,23 +276,23 @@ export const MatchSchedulerView: React.FC<MatchSchedulerViewProps> = ({
                         </div>
                       )}
 
-                      <span className="text-[10px] text-slate-400 mt-1 uppercase tracking-wider font-semibold">
-                        {isCompleted ? 'Final' : isLive ? 'Live' : 'Versus'}
+                      <span className="text-[9px] sm:text-[10px] text-slate-400 mt-1 uppercase tracking-wider font-semibold">
+                        {isCompleted ? 'Final' : isLive ? 'Live' : 'VS'}
                       </span>
                     </div>
 
                     {/* Away Team */}
                     <div className="col-span-2 text-left space-y-1">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1.5 sm:gap-2">
                         <span
-                          className="w-3.5 h-3.5 rounded-full shrink-0 shadow-sm"
+                          className="w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full shrink-0 shadow-xs"
                           style={{ backgroundColor: away?.primaryColor || '#ef4444' }}
                         />
-                        <span className="text-sm sm:text-base font-extrabold text-white truncate">
+                        <span className="text-xs sm:text-base font-extrabold text-slate-900 dark:text-white truncate">
                           {away?.name || 'Away Club'}
                         </span>
                       </div>
-                      <span className="text-[11px] text-slate-400 block font-mono">
+                      <span className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 block font-mono truncate">
                         {away?.coach ? `Coach: ${away.coach}` : ''}
                       </span>
                     </div>
@@ -303,57 +300,57 @@ export const MatchSchedulerView: React.FC<MatchSchedulerViewProps> = ({
 
                   {/* Highlights if any */}
                   {match.highlights && match.highlights.length > 0 && (
-                    <div className="mt-3 p-2 rounded-xl bg-slate-900/50 border border-slate-800/80 text-[11px] text-slate-300">
-                      <span className="text-[10px] font-bold uppercase text-slate-400 mr-2">Key Events:</span>
+                    <div className="mt-2.5 p-2 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800/80 text-[11px] text-slate-600 dark:text-slate-300">
+                      <span className="text-[10px] font-bold uppercase text-slate-400 mr-1.5">Events:</span>
                       {match.highlights.join(' • ')}
                     </div>
                   )}
 
-                  {/* Venue location pill */}
-                  <div className="text-[11px] text-slate-400 text-center mt-2">
-                    Venue: <strong className="text-slate-300">{match.venue}</strong>
+                  {/* Venue */}
+                  <div className="text-[10px] sm:text-[11px] text-slate-400 text-center mt-2 truncate">
+                    Venue: <strong className="text-slate-700 dark:text-slate-300">{match.venue}</strong>
                   </div>
                 </div>
 
-                {/* Score Controls & Action Footer */}
-                <div className="mt-4 pt-3 border-t border-slate-700/60 flex flex-wrap items-center justify-between gap-3">
-                  {/* Interactive Score Steppers (+1 / -1) */}
+                {/* Score Controls & Footer */}
+                <div className="mt-3 sm:mt-4 pt-3 border-t border-slate-100 dark:border-slate-700/60 flex flex-wrap items-center justify-between gap-2.5">
+                  {/* Steppers */}
                   {(isLive || isScheduled) && !isEditing && (
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800">
-                        <span className="text-[10px] text-slate-400 font-bold px-1.5 uppercase">
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-900 p-1 rounded-xl border border-slate-200 dark:border-slate-800">
+                        <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold px-1 uppercase">
                           {home?.shortCode || 'H'}:
                         </span>
                         <button
                           onClick={() => onUpdateScore(match.id, -1, 0)}
-                          className="w-6 h-6 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 flex items-center justify-center text-xs font-bold transition-colors cursor-pointer"
+                          className="w-6 h-6 rounded-lg bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center text-xs font-bold transition-colors cursor-pointer shadow-2xs"
                           title="Decrease Home Score"
                         >
                           -
                         </button>
                         <button
                           onClick={() => onUpdateScore(match.id, 1, 0)}
-                          className="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/40 flex items-center justify-center text-xs font-bold transition-colors cursor-pointer"
+                          className="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/40 flex items-center justify-center text-xs font-bold transition-colors cursor-pointer shadow-2xs"
                           title="Increase Home Score"
                         >
                           +1
                         </button>
                       </div>
 
-                      <div className="flex items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800">
-                        <span className="text-[10px] text-slate-400 font-bold px-1.5 uppercase">
+                      <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-900 p-1 rounded-xl border border-slate-200 dark:border-slate-800">
+                        <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold px-1 uppercase">
                           {away?.shortCode || 'A'}:
                         </span>
                         <button
                           onClick={() => onUpdateScore(match.id, 0, -1)}
-                          className="w-6 h-6 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 flex items-center justify-center text-xs font-bold transition-colors cursor-pointer"
+                          className="w-6 h-6 rounded-lg bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center text-xs font-bold transition-colors cursor-pointer shadow-2xs"
                           title="Decrease Away Score"
                         >
                           -
                         </button>
                         <button
                           onClick={() => onUpdateScore(match.id, 0, 1)}
-                          className="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/40 flex items-center justify-center text-xs font-bold transition-colors cursor-pointer"
+                          className="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/40 flex items-center justify-center text-xs font-bold transition-colors cursor-pointer shadow-2xs"
                           title="Increase Away Score"
                         >
                           +1
@@ -367,7 +364,7 @@ export const MatchSchedulerView: React.FC<MatchSchedulerViewProps> = ({
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => setEditingScoreMatchId(null)}
-                        className="px-2.5 py-1 text-xs text-slate-400 hover:text-white"
+                        className="px-2.5 py-1 text-xs text-slate-500 hover:text-slate-900 dark:hover:text-white"
                       >
                         Cancel
                       </button>
@@ -381,42 +378,42 @@ export const MatchSchedulerView: React.FC<MatchSchedulerViewProps> = ({
                   ) : (
                     <button
                       onClick={() => handleStartEdit(match)}
-                      className="text-[11px] text-slate-400 hover:text-white underline cursor-pointer"
+                      className="text-[11px] text-slate-500 dark:text-slate-400 hover:underline cursor-pointer"
                     >
-                      Direct Edit
+                      Edit
                     </button>
                   )}
 
-                  {/* State Change Buttons: Kickoff / Mark as Final */}
+                  {/* State Change Buttons */}
                   <div className="flex items-center gap-2 ml-auto">
                     {isScheduled && (
                       <button
                         onClick={() => onSetStatus(match.id, 'live')}
-                        className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/30 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+                        className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
                       >
-                        <Play className="w-3.5 h-3.5 fill-emerald-400" />
-                        Start Match (Live)
+                        <Play className="w-3.5 h-3.5 fill-emerald-500" />
+                        <span>Start</span>
                       </button>
                     )}
 
                     {isLive && (
                       <button
                         onClick={() => onSetStatus(match.id, 'completed')}
-                        className="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-extrabold flex items-center gap-1.5 transition-all cursor-pointer shadow-lg shadow-emerald-500/20 active:scale-95"
+                        className="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-extrabold flex items-center gap-1.5 transition-all cursor-pointer shadow-md shadow-emerald-500/20 active:scale-95"
                       >
                         <CheckCircle className="w-3.5 h-3.5 stroke-[2.5]" />
-                        Mark as Final
+                        <span>Mark Final</span>
                       </button>
                     )}
 
                     {isCompleted && (
                       <button
                         onClick={() => onSetStatus(match.id, 'live')}
-                        className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] font-medium flex items-center gap-1 transition-all cursor-pointer"
+                        className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-[11px] font-medium flex items-center gap-1 transition-all cursor-pointer"
                         title="Re-open match to modify live score"
                       >
                         <RotateCcw className="w-3 h-3 text-slate-400" />
-                        Re-open Match
+                        <span>Reopen</span>
                       </button>
                     )}
                   </div>
